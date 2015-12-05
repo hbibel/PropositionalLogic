@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from Formulas import *
+
 def ispunctuation(c):
     return c in '()[]{},'
 
@@ -38,55 +40,20 @@ def lex(inp):
     tokt1 = c + tokt1
     return [tokt1] + lex(rest)
 
-class Formula(object):
-    pass
-
-class FBoolean(Formula):
-    def __init__(self, v):
-        self.val = v
-
-class FAtom(Formula):
-    def __init__(self, r):
-        self.representative = r
-
-class FNot(Formula):
-    def __init__(self, o):
-        self.operand = o
-
-class FAnd(Formula):
-    def __init__(self, l, r):
-        self.leftoperand = l
-        self.rightoperand = r
-
-class FOr(Formula):
-    def __init__(self, l, r):
-        self.leftoperand = l
-        self.rightoperand = r
-
-class FImp(Formula):
-    def __init__(self, l, r):
-        self.leftoperand = l
-        self.rightoperand = r
-
-class FIff(Formula):
-    def __init__(self, l, r):
-        self.leftoperand = l
-        self.rightoperand = r
-
 # <=>
-def parseexpression(inp):
+def parseexpression(inp): # inp = list of tokens
     e1, i1 = parseimp(inp)
     if len(i1) > 0 and i1[0] == '<=>':
         e2, i2 = parseexpression(i1[1:])
-        return FIff(e1, e2)
+        return FIff(e1, e2), i2
     return e1, i1
 
 # =>
 def parseimp(inp):
     e1, i1 = parseor(inp)
-    if len(i1) > 0 and  i1[0] == '=>':
+    if len(i1) > 0 and  i1[0] == '==>':
         e2, i2 = parseor(i1[1:])
-        return FImp(e1, e2)
+        return FImp(e1, e2), i2
     return e1, i1
 
 # \/
@@ -113,7 +80,7 @@ def parsenegation(inp):
     return parseatom(inp)
 
 # atom
-def parseatom(inp): # inp = list of tokens
+def parseatom(inp):
     if inp == []:
         raise ValueError("Missing token. Expected an atomic expression here. Misformed input?")
     if ispunctuation(inp[0][0]):
