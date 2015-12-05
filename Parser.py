@@ -37,3 +37,99 @@ def lex(inp):
     tokt1, rest = lexwhile(prop, cs)
     tokt1 = c + tokt1
     return [tokt1] + lex(rest)
+
+class Formula(object):
+    pass
+
+class FBoolean(Formula):
+    def __init__(self, v):
+        self.val = v
+
+class FAtom(Formula):
+    def __init__(self, r):
+        self.representative = r
+
+class FNot(Formula):
+    def __init__(self, o):
+        self.operand = o
+
+class FAnd(Formula):
+    def __init__(self, l, r):
+        self.leftoperand = l
+        self.rightoperand = r
+
+class FOr(Formula):
+    def __init__(self, l, r):
+        self.leftoperand = l
+        self.rightoperand = r
+
+class FImp(Formula):
+    def __init__(self, l, r):
+        self.leftoperand = l
+        self.rightoperand = r
+
+class FIff(Formula):
+    def __init__(self, l, r):
+        self.leftoperand = l
+        self.rightoperand = r
+
+# <=>
+def parseexpression(inp):
+    e1, i1 = parseimp(inp)
+    if len(i1) > 0 and i1[0] == '<=>':
+        e2, i2 = parseexpression(i1[1:])
+        return FIff(e1, e2)
+    return e1, i1
+
+# =>
+def parseimp(inp):
+    e1, i1 = parseor(inp)
+    if len(i1) > 0 and  i1[0] == '=>':
+        e2, i2 = parseor(i1[1:])
+        return FImp(e1, e2)
+    return e1, i1
+
+# \/
+def parseor(inp):
+    e1, i1 = parseand(inp)
+    if len(i1) > 0 and  i1[0] == '\\/':
+        e2, i2 = parseand(i1[1:])
+        return FOr(e1, e2), i2
+    return e1, i1
+
+# /\
+def parseand(inp):
+    e1, i1 = parsenegation(inp)
+    if len(i1) > 0 and  i1[0] == '/\\':
+        e2, i2 = parsenegation(i1[1:])
+        return FAnd(e1, e2), i2
+    return e1, i1
+
+# ~
+def parsenegation(inp):
+    if inp[0][0] == '~':
+        e1, i1 = parseatom(inp[1:])
+        return FNot(e1), i1
+    return parseatom(inp)
+
+# atom
+def parseatom(inp): # inp = list of tokens
+    if inp == []:
+        raise ValueError("Missing token. Expected an atomic expression here. Misformed input?")
+    if ispunctuation(inp[0][0]):
+        e2, i2 = parseexpression(inp[1:]) # i2 here is actually i2[1:] in Harrison
+        if ispunctuation(i2[0][0]): # TODO: Check for actual closing bracket
+            return e2, i2[1:]
+        else:
+            raise ValueError("I could not found a closing bracket...")
+    return FAtom(inp[0]), inp[1:]
+
+def makeparser(parser, s):
+    expr, rest = parser(lex(s))
+    if rest == []:
+        return expr
+    else:
+        raise AssertionError("Unparsed input!")
+
+def defaultparser(s):
+    return makeparser(parseexpression, s)
