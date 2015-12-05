@@ -15,6 +15,8 @@ class FAtom(Formula):
         self.representative = r
     def __eq__(self, other):
         return self.representative == other.representative
+    def __hash__(self):
+        return self.representative.__hash__()
 
 class FNot(Formula):
     def __init__(self, o):
