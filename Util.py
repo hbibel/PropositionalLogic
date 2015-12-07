@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from Formulas import *
+from itertools import combinations
 
 # this would be a lot nicer if I used the visitor pattern, but since this is just a homework assignment I don't 
 # try to write the most beautiful code
 def evaluate(fm, v):
     if type(fm) is FBoolean:
-        return fm.value
+        return fm.val
     elif type(fm) is FAtom:
         return v(fm.representative)
     elif type(fm) is FNot:
@@ -31,3 +32,27 @@ def atoms(fm):
     else:
         return atoms(fm.leftoperand).union(atoms(fm.rightoperand))
 
+def onallvaluations(fm):
+    ats = map(lambda a: a.representative, atoms(fm))    
+    alltrue = True
+    for i in range(len(ats) + 1):
+        cs = set(combinations(ats, i)) # all subsets of ats of length i
+        for tupl in cs:
+            evalresult = evaluate(fm, lambda x: x in tupl)
+            alltrue = evalresult and alltrue
+            if not alltrue:
+                return False
+    return alltrue
+
+def tautology(fm):
+    return onallvaluations(fm)
+
+def unsatisfiable(fm):
+    return tautology(FNot(fm))
+
+def satisfiable(fm):
+    return not unsatisfiable(fm)
+
+def entails(f1, f2):
+    f = FAnd(f1, FNot(f2))
+    return unsatisfiable(f)

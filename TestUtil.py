@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+
+from Util import *
+
+p = FAtom('p')
+q = FAtom('q')
+r = FAtom('r')
+f1 = FAnd(FOr(p, q), FAnd(FNot(p), FNot(q)))
+print unsatisfiable(f1)
+print not tautology(f1)
+print not satisfiable(f1)
+f2 = FOr(p, FOr(q, FOr(r, FAnd(FNot(p), FAnd(FNot(q), FNot(r))))))
+print not unsatisfiable(f2)
+print tautology(f2)
+print satisfiable(f2)
+f3 = FIff(FImp(p, q), FOr(FNot(p), q))
+print not unsatisfiable(f3)
+print tautology(f3)
+print satisfiable(f3)
+f4 = FImp(FAnd(p, q), r)
+print not unsatisfiable(f4)
+print not tautology(f4)
+print satisfiable(f4)
+b = FBoolean(True)
+print satisfiable(b)
+print tautology(b)
+print unsatisfiable(FNot(b))
