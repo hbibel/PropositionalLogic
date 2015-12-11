@@ -1,0 +1,8 @@
+Question 4.1: On paper, we checked a |= b by examining whether the model M(a) is a subset of M(b). The program iterates over all valuations of ~(a & ~b) to test whether they all evaluate to True. If so, ~(a & ~b) is unsatisfiable and thus, a |= b is True.
+
+Question 4.2.3: In general, KB |/= a does not imply KB |= ~a. 
+Proof by counter example:
+KB := a /\ (b \/ ~b)
+alpha := a /\ ~b
+We see: KB |/= alpha
+but also: KB |/= not alpha
