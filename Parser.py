@@ -96,7 +96,7 @@ def makeparser(parser, s):
     if rest == []:
         return expr
     else:
-        raise AssertionError("Unparsed input!")
+        raise AssertionError("Unparsed input: " + str(rest))
 
 def defaultparser(s):
     return makeparser(parseexpression, s)
